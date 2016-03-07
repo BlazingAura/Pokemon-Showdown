@@ -360,7 +360,7 @@ exports.commands = {
 		}
 
 		if (randomOutput && randomOutput < results.length) {
-			results = results.randomize().slice(0, randomOutput);
+			results = Tools.shuffle(results).slice(0, randomOutput);
 		}
 
 		let resultsStr = this.broadcasting ? "" : ("<font color=#999999>" + Tools.escapeHTML(message) + ":</font><br>");

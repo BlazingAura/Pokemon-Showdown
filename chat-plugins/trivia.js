@@ -204,9 +204,9 @@ let Trivia = (() => {
 		if (this.participants.size < 3) return output.sendReply("Not enough users have signed up yet! Trivia games require at least three participants to run.");
 
 		if (this.category === 'random') {
-			this.currentQuestions = triviaData.questions.randomize();
+			this.currentQuestions = Tools.shuffle(triviaData.questions.slice());
 		} else {
-			this.currentQuestions = sliceCategory(this.category).randomize();
+			this.currentQuestions = Tools.shuffle(sliceCategory(this.category).slice());
 		}
 
 		if (!this.currentQuestions.length) {

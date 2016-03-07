@@ -751,7 +751,7 @@ exports.BattleScripts = {
 			} else if (template.learnset) {
 				pool = Object.keys(template.learnset);
 				if (template.species.substr(0, 6) === 'Rotom-' || template.species.substr(0, 10) === 'Pumpkaboo-') {
-					pool = pool.union(Object.keys(this.getTemplate(template.baseSpecies).learnset));
+					pool = Array.from(new Set(pool.concat(Object.keys(this.getTemplate(template.baseSpecies).learnset))));
 				}
 			} else {
 				pool = Object.keys(this.getTemplate(template.baseSpecies).learnset);
@@ -3202,14 +3202,14 @@ exports.BattleScripts = {
 		let pokemon = '';
 		let set = {};
 		let sides = {
-			good: [
+			good: this.shuffle([
 				'Rick', 'Morty', 'Summer', 'Mr. Meeseks', 'Scary Terry', 'Dr. Xenon Bloom', 'Bird Person', 'Squanchy', 'Krombopulos Michael', 'Unity',
 				'Morty Jr.', 'Dipper', 'Mabel', 'Stanley', 'Stanford', 'Wendy', 'Soos', 'Fiddleford McGucket', 'Time Baby', 'Blendin',
-			].randomize(),
-			bad: [
+			]),
+			bad: this.shuffle([
 				'Evil Rick', 'Evil Morty', 'King Flippy Nips', 'Mr. Lucius Needful', 'Snowball', 'Mr. Jellybean', 'Poncho',
 				'Galactic Fed Soldier', 'Tammy', 'Bill Cipher', "Lil' Gideon", '8-Ball', 'Keyhole', 'Pacifier',
-			].randomize(),
+			]),
 		};
 		let mons = {
 			'Rick': {species: 'alakazam', ability: 'regenerator', item: 'lifeorb', gender: 'M', moves: ['psystrike', 'recover', 'aurasphere', 'watergun'], signatureMove: 'Portal Gun'},

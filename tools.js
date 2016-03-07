@@ -618,6 +618,17 @@ module.exports = (() => {
 		return banlistTable;
 	};
 
+	Tools.prototype.shuffle = function (arr) {
+		// In-place shuffle by Fisher-Yates algorithm
+		for (let i = arr.length - 1; i > 0; i--) {
+			let j = Math.floor(Math.random() * (i + 1));
+			let temp = arr[i];
+			arr[i] = arr[j];
+			arr[j] = temp;
+		}
+		return arr;
+	};
+
 	Tools.prototype.levenshtein = function (s, t, l) { // s = string 1, t = string 2, l = limit
 		// Original levenshtein distance function by James Westgate, turned out to be the fastest
 		let d = []; // 2d matrix
