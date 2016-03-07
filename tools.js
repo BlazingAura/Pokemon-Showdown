@@ -73,6 +73,18 @@ module.exports = (() => {
 		}
 	}
 
+	function deepClone(obj) {
+		if (typeof obj === 'function') return obj;
+		if (obj === null || typeof obj !== 'object') return obj;
+		if (Array.isArray(obj)) return obj.map(deepClone);
+		const clone = Object.create(Object.getPrototypeOf(obj));
+		const keys = Object.keys(obj);
+		for (let i = 0; i < keys.length; i++) {
+			clone[keys[i]] = deepClone(obj[keys[i]]);
+		}
+		return clone;
+	}
+
 	function Tools(mod) {
 		if (!mod) mod = 'base';
 		this.isBase = (mod === 'base');
@@ -110,7 +122,7 @@ module.exports = (() => {
 	Tools.prototype.modData = function (dataType, id) {
 		if (this.isBase) return this.data[dataType][id];
 		if (this.data[dataType][id] !== moddedTools[this.parentMod].data[dataType][id]) return this.data[dataType][id];
-		return (this.data[dataType][id] = Object.clone(this.data[dataType][id], true));
+		return (this.data[dataType][id] = deepClone(this.data[dataType][id]));
 	};
 
 	Tools.prototype.effectToString = function () {
@@ -244,10 +256,10 @@ module.exports = (() => {
 			}
 			name = template.species || template.name || name;
 			if (this.data.FormatsData[id]) {
-				Object.merge(template, this.data.FormatsData[id]);
+				Object.assign(template, this.data.FormatsData[id]);
 			}
 			if (this.data.Learnsets[id]) {
-				Object.merge(template, this.data.Learnsets[id]);
+				Object.assign(template, this.data.Learnsets[id]);
 			}
 			if (!template.id) template.id = id;
 			if (!template.name) template.name = name;
@@ -360,7 +372,7 @@ module.exports = (() => {
 	Tools.prototype.getMoveCopy = function (move) {
 		if (move && move.isCopy) return move;
 		move = this.getMove(move);
-		let moveCopy = Object.clone(move, true);
+		let moveCopy = deepClone(move);
 		moveCopy.isCopy = true;
 		return moveCopy;
 	};
@@ -993,7 +1005,7 @@ module.exports = (() => {
 			}
 			let BattleData = maybeData['Battle' + dataType];
 			if (!BattleData || typeof BattleData !== 'object') throw new TypeError("Exported property `Battle" + dataType + "`from `" + './data/' + dataFiles[dataType] + "` must be an object except `null`.");
-			if (BattleData !== data[dataType]) data[dataType] = Object.merge(BattleData, data[dataType]);
+			if (BattleData !== data[dataType]) data[dataType] = Object.assign(BattleData, data[dataType]);
 		}
 		if (this.isBase) {
 			// Formats are inherited by mods
@@ -1010,7 +1022,7 @@ module.exports = (() => {
 						// If it doesn't exist it's inherited from the parent data
 						if (dataType === 'Pokedex') {
 							// Pokedex entries can be modified too many different ways
-							data[dataType][key] = Object.clone(parentTypedData[key], true);
+							data[dataType][key] = deepClone(parentTypedData[key]);
 						} else {
 							data[dataType][key] = parentTypedData[key];
 						}
@@ -1018,7 +1030,11 @@ module.exports = (() => {
 						// {inherit: true} can be used to modify only parts of the parent data,
 						// instead of overwriting entirely
 						delete data[dataType][key].inherit;
-						Object.merge(data[dataType][key], parentTypedData[key], false, false);
+						Object.keys(parentTypedData[key] || {}).reduce((childEntry, subKey) => {
+							if (subKey in childEntry) return childEntry;
+							childEntry[subKey] = parentTypedData[key][subKey];
+							return childEntry;
+						}, data[dataType][key]);
 					}
 				}
 			}

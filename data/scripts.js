@@ -240,7 +240,7 @@ exports.BattleScripts = {
 		let boosts, boost;
 		if (accuracy !== true) {
 			if (!move.ignoreAccuracy) {
-				boosts = this.runEvent('ModifyBoost', pokemon, null, null, Object.clone(pokemon.boosts));
+				boosts = this.runEvent('ModifyBoost', pokemon, null, null, Object.assign({}, pokemon.boosts));
 				boost = this.clampIntRange(boosts['accuracy'], -6, 6);
 				if (boost > 0) {
 					accuracy *= boostTable[boost];
@@ -249,7 +249,7 @@ exports.BattleScripts = {
 				}
 			}
 			if (!move.ignoreEvasion) {
-				boosts = this.runEvent('ModifyBoost', target, null, null, Object.clone(target.boosts));
+				boosts = this.runEvent('ModifyBoost', target, null, null, Object.assign({}, target.boosts));
 				boost = this.clampIntRange(boosts['evasion'], -6, 6);
 				if (boost > 0) {
 					accuracy /= boostTable[boost];
@@ -747,7 +747,7 @@ exports.BattleScripts = {
 			let moves;
 			let pool = ['struggle'];
 			if (poke === 'Smeargle') {
-				pool = Object.keys(this.data.Movedex).exclude('chatter', 'struggle', 'paleowave', 'shadowstrike', 'magikarpsrevenge');
+				pool = Object.keys(this.data.Movedex).filter(moveid => !(moveid in {'chatter':1, 'struggle':1, 'paleowave':1, 'shadowstrike':1, 'magikarpsrevenge':1}));
 			} else if (template.learnset) {
 				pool = Object.keys(template.learnset);
 				if (template.species.substr(0, 6) === 'Rotom-' || template.species.substr(0, 10) === 'Pumpkaboo-') {

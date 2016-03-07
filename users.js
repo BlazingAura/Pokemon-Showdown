@@ -270,7 +270,11 @@ function cacheGroupData() {
 			cachedGroups[sym] = 'processing';
 			let inheritGroup = groups[groupData['inherit']];
 			if (cacheGroup(groupData['inherit'], inheritGroup)) {
-				Object.merge(groupData, inheritGroup, false, false);
+				Object.keys(inheritGroup || {}).reduce((targetObj, key) => {
+					if (key in targetObj) return targetObj;
+					targetObj[key] = inheritGroup[key];
+					return targetObj;
+				}, groupData);
 			}
 			delete groupData['inherit'];
 		}
@@ -1153,7 +1157,7 @@ class User {
 				}
 			}
 			this.roomCount = {};
-			if (!this.named && Object.isEmpty(this.prevNames)) {
+			if (!this.named && !Object.keys(this.prevNames).length) {
 				// user never chose a name (and therefore never talked/battled)
 				// there's no need to keep track of this user, so we can
 				// immediately deallocate
@@ -1203,11 +1207,13 @@ class User {
 	}
 	getLastName() {
 		if (this.named) return this.name;
-		return "[" + (Object.keys(this.prevNames).last() || this.name) + "]";
+		const prevNames = Object.keys(this.prevNames);
+		return "[" + (prevNames.length ? prevNames[prevNames.length - 1] : this.name) + "]";
 	}
 	getLastId() {
 		if (this.named) return this.userid;
-		return Object.keys(this.prevNames).last() || this.userid;
+		const prevNames = Object.keys(this.prevNames);
+		return (prevNames.length ? prevNames[prevNames.length - 1] : this.userid);
 	}
 	ban(noRecurse, userid) {
 		// recurse only once; the root for-loop already bans everything with your IP
@@ -1449,7 +1455,10 @@ class User {
 			};
 		}
 		this.send('|updatechallenges|' + JSON.stringify({
-			challengesFrom: Object.map(this.challengesFrom, 'format'),
+			challengesFrom: Object.keys(this.challengesFrom).reduce((prev, next) => {
+				prev[next] = this.challengesFrom[next].format;
+				return prev;
+			}, {}),
 			challengeTo: challengeTo,
 		}));
 	}

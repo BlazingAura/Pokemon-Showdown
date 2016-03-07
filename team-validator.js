@@ -131,7 +131,7 @@ class Validator {
 		if (set.species !== set.name && set.baseSpecies !== set.name) name = set.name + " (" + set.species + ")";
 		let isHidden = false;
 		let lsetData = {set:set, format:format};
-		if (flags) Object.merge(lsetData, flags);
+		if (flags) Object.assign(lsetData, flags);
 
 		let setHas = {};
 

@@ -232,10 +232,10 @@ exports.commands = {
 		searches.sort((a, b) => {
 			let aCount = 0, bCount = 0;
 			for (let cat in a) {
-				if (typeof a[cat] === "object") aCount += Object.size(a[cat]);
+				if (typeof a[cat] === "object") aCount += Object.keys(a[cat]).length;
 			}
 			for (let cat in b) {
-				if (typeof b[cat] === "object") bCount += Object.size(b[cat]);
+				if (typeof b[cat] === "object") bCount += Object.keys(b[cat]).length;
 			}
 			return aCount - bCount;
 		});
@@ -245,18 +245,18 @@ exports.commands = {
 			if (alts.skip) continue;
 			for (let mon in dex) {
 				let matched = false;
-				if (Object.size(alts.gens) > 0) {
-					if (alts.gens[dex[mon].gen] || (Object.count(alts.gens, false) > 0 &&
+				if (Object.keys(alts.gens).length) {
+					if (alts.gens[dex[mon].gen] || (Object.keys(alts.gens).some(key => alts.gens[key] === false) &&
 						alts.gens[dex[mon].gen] !== false)) continue;
 				}
 
-				if (Object.size(alts.colors) > 0) {
-					if (alts.colors[dex[mon].color] || (Object.count(alts.colors, false) > 0 &&
+				if (Object.keys(alts.colors).length) {
+					if (alts.colors[dex[mon].color] || (Object.keys(alts.colors).some(key => alts.colors[key] === false) &&
 						alts.colors[dex[mon].color] !== false)) continue;
 				}
 
-				if (Object.size(alts.tiers) > 0) {
-					if (alts.tiers[dex[mon].tier.toLowerCase()] || (Object.count(alts.tiers, false) > 0 &&
+				if (Object.keys(alts.tiers).length) {
+					if (alts.tiers[dex[mon].tier.toLowerCase()] || (Object.keys(alts.tiers).some(key => alts.tiers[key] === false) &&
 						alts.tiers[dex[mon].tier.toLowerCase()] !== false)) continue;
 				}
 
@@ -269,7 +269,7 @@ exports.commands = {
 				if (matched) continue;
 
 				for (let ability in alts.abilities) {
-					if (alts.abilities[ability] === (Object.count(dex[mon].abilities, ability) > 0)) {
+					if (alts.abilities[ability] === Object.keys(dex[mon].abilities).some(key => dex[mon].abilities[key] === ability)) {
 						matched = true;
 						break;
 					}
@@ -343,11 +343,7 @@ exports.commands = {
 		}
 
 		let moveGroups = searches
-			.filter(alts => {
-				return Object.any(alts.moves, (move, isSearch) => {
-					return isSearch;
-				});
-			})
+			.filter(alts => Object.keys(alts.moves).some(move => alts.moves[move]))
 			.map(alts => Object.keys(alts.moves));
 		if (moveGroups.length >= 2) {
 			results = results.filter(mon => {
@@ -488,7 +484,7 @@ exports.commands = {
 
 			let template = Tools.getTemplate(target);
 			if (template.exists) {
-				if (Object.size(lsetData) !== 0) return this.sendReplyBox("A search can only include one Pok\u00e9mon learnset.");
+				if (Object.keys(lsetData).length) return this.sendReplyBox("A search can only include one Pok\u00e9mon learnset.");
 				if (!template.learnset) template = Tools.getTemplate(template.baseSpecies);
 				lsetData = template.learnset;
 				targetMon = template.name;
@@ -621,7 +617,9 @@ exports.commands = {
 			return this.sendReplyBox("'" + Tools.escapeHTML(oldTarget) + "' could not be found in any of the search categories.");
 		}
 
-		if (showAll && Object.size(searches) === 0 && !targetMon) return this.sendReplyBox("No search parameters other than 'all' were found. Try '/help movesearch' for more information on this command.");
+		if (showAll && !Object.keys(searches).length && !targetMon) {
+			return this.sendReplyBox("No search parameters other than 'all' were found. Try '/help movesearch' for more information on this command.");
+		}
 
 		let dex = {};
 		if (targetMon) {
@@ -641,7 +639,7 @@ exports.commands = {
 			case 'category':
 				for (let move in dex) {
 					if (searches[search][String(dex[move][search])] === false ||
-						Object.count(searches[search], true) > 0 && !searches[search][String(dex[move][search])]) {
+						Object.keys(searches[search]).some(key => searches[search][key] === true) && !searches[search][String(dex[move][search])]) {
 						delete dex[move];
 					}
 				}
