@@ -977,7 +977,7 @@ exports.commands = {
 			let uptimeHours = Math.floor(uptime / (60 * 60)) - uptimeDays * 24;
 			if (uptimeHours) uptimeText += ", " + uptimeHours + " " + (uptimeHours === 1 ? "hour" : "hours");
 		} else {
-			uptimeText = (uptime * 1000).duration();
+			uptimeText = Tools.toDurationString(uptime * 1000);
 		}
 		this.sendReplyBox("Uptime: <b>" + uptimeText + "</b>");
 	},
