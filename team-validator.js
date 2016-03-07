@@ -925,6 +925,8 @@ if (!process.send) {
 	};
 } else {
 	require('sugar-deprecated')(require('./crashlogger.js'));
+	require('object.values').shim();
+
 	global.Config = require('./config/config.js');
 
 	if (Config.crashguard) {

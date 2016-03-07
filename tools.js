@@ -14,6 +14,8 @@
 'use strict';
 
 require('sugar-deprecated')(require('./crashlogger.js'));
+require('object.values').shim();
+
 const fs = require('fs');
 const path = require('path');
 

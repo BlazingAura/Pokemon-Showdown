@@ -13,6 +13,7 @@
 'use strict';
 
 require('sugar-deprecated')(require('./crashlogger.js'));
+require('object.values').shim();
 
 global.Config = require('./config/config.js');
 
